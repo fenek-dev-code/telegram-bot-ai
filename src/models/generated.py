@@ -6,7 +6,15 @@ from sqlalchemy.orm import relationship
 from src.database import Base
 
 
-class Format(Enum):
+class GeneratedStatus(Enum):
+    """Status of generated content."""
+
+    PROCESSING = "processing"
+    COMPLETED = "completed"
+    FAILED = "failed"
+
+
+class GenerateFormat(Enum):
     """Formats for generated content."""
 
     VIDEO = "video"
@@ -17,9 +25,9 @@ class Format(Enum):
 class Generated(Base):
     __tablename__ = "converted_videos"
 
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    status = Column(String(20), default="processing")  # processing, completed, failed
-    format = Column(String(10), default="video")  # video, audio, image
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    status = Column(String(30), default=GeneratedStatus.PROCESSING)
+    format = Column(String(30), default=GenerateFormat.VIDEO)
     time_duration = Column(Float, nullable=True)
     amount_tokens = Column(Float, nullable=True)
 
