@@ -1,13 +1,10 @@
-import os
-import sys
 from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config, pool
 
 from alembic import context
-
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-from src import models
+from src import models #igrnore
+from src.core.config import config as conf
 from src.database import Base
 
 # this is the Alembic Config object, which provides
@@ -19,8 +16,8 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-
 # add your model's MetaData object here
+config.set_main_option("sqlalchemy.url", conf.DATABASE_URL)
 
 target_metadata = Base.metadata
 

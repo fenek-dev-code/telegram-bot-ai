@@ -1,7 +1,6 @@
 from sqlalchemy import (
     Boolean,
     Column,
-    DateTime,
     Float,
     ForeignKey,
     Integer,
@@ -9,8 +8,6 @@ from sqlalchemy import (
 )
 
 # from sqlalchemy.orm import relationship
-from sqlalchemy.sql import func
-
 from src.database import Base
 
 
@@ -24,8 +21,6 @@ class User(Base):
     invited_by = Column(Integer, ForeignKey("users.id"), nullable=True)
     referral_code = Column(String(50), unique=True, nullable=True)
     banned = Column(Boolean, default=False)
-    converted_videos = Column(Integer, default=0)
-    last_active = Column(DateTime(timezone=True), server_default=func.now())
 
     # # Связи
     # referrer = relationship("User", remote_side=[id], backref="referrals")
