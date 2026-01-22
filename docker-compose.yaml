@@ -1,0 +1,12 @@
+services:
+  db:
+    container_name: telegram-bot-ai-db
+    image: postgres:16.4
+    environment:
+      POSTGRES_USER: telegram_bot_ai
+      POSTGRES_PASSWORD: telegram_bot_ai
+      POSTGRES_DB: telegram_bot_ai
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
