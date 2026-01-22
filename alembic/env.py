@@ -1,10 +1,13 @@
+import sys
 from logging.config import fileConfig
+from pathlib import Path
 
 from sqlalchemy import engine_from_config, pool
 
+sys.path.append(str(Path(__file__).parent.parent))
+
 from alembic import context
-from src import models #igrnore
-from src.core.config import config as conf
+from src import models
 from src.database import Base
 
 # this is the Alembic Config object, which provides
@@ -17,7 +20,9 @@ if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 # add your model's MetaData object here
-config.set_main_option("sqlalchemy.url", conf.DATABASE_URL)
+
+
+# config.set_main_option("sqlalchemy.url", conf.DATABASE_URL)
 
 target_metadata = Base.metadata
 
@@ -40,6 +45,9 @@ def run_migrations_offline() -> None:
 
     """
     url = config.get_main_option("sqlalchemy.url")
+    if url is not None and url.startswith("postgresql+asyncpg://"):
+        url = url.replace("postgresql+asyncpg://", "postgresql://")
+
     context.configure(
         url=url,
         target_metadata=target_metadata,
