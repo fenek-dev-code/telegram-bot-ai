@@ -1,14 +1,12 @@
 from enum import Enum
 
-from sqlalchemy import Column, Float, ForeignKey, Integer, String
-from sqlalchemy.orm import relationship
+from sqlalchemy import Float, ForeignKey, Integer, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.database import Base
 
 
-class PaymentStatus(Enum):
-    """Status of generated content."""
-
+class PaymentStatus(str, Enum):
     PROCESSING = "processing"
     COMPLETED = "completed"
     FAILED = "failed"
@@ -16,9 +14,9 @@ class PaymentStatus(Enum):
 
 class Transaction(Base):
     __tablename__ = "transactions"
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
-    amount = Column(Float, nullable=False)
-    status = Column(String(30), default=PaymentStatus.PROCESSING)
+    user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"), index=True)
+    amount: Mapped[float] = mapped_column(Float, nullable=False)
+    status: Mapped[str] = mapped_column(String(30), default=PaymentStatus.PROCESSING)
 
     # Связи
     user = relationship("User", back_populates="transactions")

@@ -1,7 +1,7 @@
 from enum import Enum
 
-from sqlalchemy import Column, Float, ForeignKey, Integer, String
-from sqlalchemy.orm import relationship
+from sqlalchemy import Float, ForeignKey, Integer, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.database import Base
 
@@ -25,11 +25,13 @@ class GenerateFormat(Enum):
 class Generated(Base):
     __tablename__ = "converted_videos"
 
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
-    status = Column(String(30), default=GeneratedStatus.PROCESSING)
-    format = Column(String(30), default=GenerateFormat.VIDEO)
-    time_duration = Column(Float, nullable=True)
-    amount_tokens = Column(Float, nullable=True)
+    user_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("users.id"), nullable=False, index=True
+    )
+    status: Mapped[str] = mapped_column(String(30), default=GeneratedStatus.PROCESSING)
+    format: Mapped[str] = mapped_column(String(30), default=GenerateFormat.VIDEO)
+    time_duration: Mapped[float] = mapped_column(Float, nullable=True)
+    amount_tokens: Mapped[float] = mapped_column(Float, nullable=True)
 
     # Связи
     user = relationship("User", back_populates="videos")

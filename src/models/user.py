@@ -1,12 +1,11 @@
 from sqlalchemy import (
     Boolean,
-    Column,
     Float,
     ForeignKey,
     Integer,
     String,
 )
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.database import Base
 
@@ -14,13 +13,19 @@ from src.database import Base
 class User(Base):
     __tablename__ = "users"
 
-    user_id = Column(Integer, unique=True, index=True, nullable=False)
-    username = Column(String, nullable=True)
-    balance = Column(Float, default=0.0)
+    user_id: Mapped[int] = mapped_column(
+        Integer, unique=True, index=True, nullable=False
+    )
+    username: Mapped[str] = mapped_column(String, nullable=True)
+    balance: Mapped[float] = mapped_column(Float, default=0.0)
 
-    invited_by = Column(Integer, ForeignKey("users.id"), nullable=True)
-    referral_code = Column(String(50), unique=True, nullable=True)
-    banned = Column(Boolean, default=False)
+    invited_by: Mapped[int | None] = mapped_column(
+        Integer, ForeignKey("users.id"), nullable=True
+    )
+    referral_code: Mapped[str | None] = mapped_column(
+        String(50), unique=True, nullable=True
+    )
+    banned: Mapped[bool | None] = mapped_column(Boolean, default=None)
 
     # Связи
     # Self-referential relationship — remote_side должен ссылаться на PK (id).
