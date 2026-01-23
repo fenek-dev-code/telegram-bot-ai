@@ -12,6 +12,10 @@ class Settings(BaseSettings):
 
     BOT_TOKEN: str = ""
     DATABASE_URL: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/postgres"
+    DATABASE_MAX_OVERFLOW: int = 5
+    DATABASE_POOL_PRE_PING: bool = True
+    DATABASE_POOL_RECYCLE: int = 3600
+    DATABASE_ECHO: bool = False
 
     # Опциональные с дефолтами
     ADMIN_IDS: List[int] = []
@@ -24,5 +28,4 @@ class Settings(BaseSettings):
     MAX_VIDEO_SIZE_MB: int = 500
 
 
-# Глобальный объект настроек
 config = Settings()
