@@ -46,4 +46,42 @@ def setup_production_logger():
     return logger
 
 
-log = setup_production_logger()
+def setup_dev_logger():
+    """Development логгер с цветами и эмодзи"""
+
+    # Удаляем стандартные обработчики
+    logger.remove()
+
+    # Формат с эмодзи и цветами
+    format = (
+        "<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> | "
+        "<level>{level.icon} {level: <8}</level> | "
+        "<cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> | "
+        "<level>{message}</level>"
+    )
+
+    # Добавляем эмодзи для уровней
+    logger.level("TRACE", color="<fg #666666>", icon="🔍")
+    logger.level("DEBUG", color="<cyan>", icon="🐛")
+    logger.level("INFO", color="<bold><fg #34eb58>", icon="ℹ️")
+    logger.level("SUCCESS", color="<bold><green>", icon="✅")
+    logger.level("WARNING", color="<bold><yellow>", icon="⚠️")
+    logger.level("ERROR", color="<bold><red>", icon="❌")
+    logger.level("CRITICAL", color="<bold><fg #ff00ff>", icon="💀")
+
+    # Основной консольный вывод
+    logger.add(
+        sys.stdout,
+        format=format,
+        level="DEBUG",
+        colorize=True,
+        backtrace=True,
+        diagnose=True,
+        catch=True,
+    )
+    return logger
+
+
+log = setup_dev_logger()
+if conf.PROD:
+    log = setup_production_logger()

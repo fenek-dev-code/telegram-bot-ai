@@ -25,6 +25,7 @@ class GenerateFormat(Enum):
 class Generated(Base):
     __tablename__ = "converted_videos"
 
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     user_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("users.id"), nullable=False, index=True
     )

@@ -19,13 +19,17 @@ class Settings(BaseSettings):
 
     # Опциональные с дефолтами
     ADMIN_IDS: List[int] = []
-    LOG_LEVEL: str = "info"
+    LOG_LEVEL: str = "DEBUG"
     DEBUG: bool = False
+    PROD: bool = False
 
     # Настройки вашего проекта
     REFERRAL_PERCENT: float = 5.0
     VIDEO_CONVERSION_PRICE: float = 10.0
     MAX_VIDEO_SIZE_MB: int = 500
+
+    YOOKASSA_ID: str = ""
+    YOOKASSA_KEY: str = ""
 
 
 config = Settings()
