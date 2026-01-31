@@ -49,5 +49,8 @@ class UserService:
         return await self.repo.get_user_with_deps(id)
 
     async def update_user_balance(self, id: int, amount: float):
-        await self.repo.update_user(id, balance=amount)
-        await self.repoTr.create_transaction(id, amount)
+        user = await self.repo.update_user(id, balance=amount)
+        if user:
+            await self.repoTr.create_transaction(id, amount)
+            referal_cent = (amount / 100) * 5
+            await self.repo.update_user(user.referrer_id, balance=referal_cent)
