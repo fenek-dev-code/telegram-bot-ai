@@ -1,6 +1,10 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.core.repository import ReferLinkRepository, UserRepository
+from src.core.repository import (
+    ReferLinkRepository,
+    TransactionRepository,
+    UserRepository,
+)
 from src.models import User
 
 
@@ -8,6 +12,7 @@ class UserService:
     def __init__(self, session: AsyncSession):
         self.repo = UserRepository(session)
         self.promoRepo = ReferLinkRepository(session)
+        self.repoTr = TransactionRepository(session)
 
     async def create_user(
         self, id: int, ref_code: str = "", username: str | None = None
@@ -42,3 +47,7 @@ class UserService:
 
     async def get_user_stat(self, id: int) -> User | None:
         return await self.repo.get_user_with_deps(id)
+
+    async def update_user_balance(self, id: int, amount: float):
+        await self.repo.update_user(id, balance=amount)
+        await self.repoTr.create_transaction(id, amount)

@@ -13,7 +13,9 @@ class TransactionRepository:
         self, user_id: int, amount: float
     ) -> Transaction | None:
         try:
-            transaction = Transaction(user_id=user_id, amount=amount)
+            transaction = Transaction(
+                user_id=user_id, amount=amount, status="completed"
+            )
             self.session.add(transaction)
             await self.session.commit()
             await self.session.refresh(transaction)
@@ -37,4 +39,3 @@ class TransactionRepository:
             await self.session.rollback()
             log.error(f"Error updating transaction: {e}")
         return None
-

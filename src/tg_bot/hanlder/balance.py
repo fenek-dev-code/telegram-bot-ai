@@ -1,8 +1,7 @@
-from aiogram import F, Router, types
+from aiogram import F, Router, exceptions, types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
-from pydantic import InstanceOf
 from yookassa.payment import Payment, PaymentResponse
 
 from src.core.service import UserService
@@ -61,7 +60,7 @@ async def user_send_count(message: types.Message, state: FSMContext):
             url = payment.confirmation.confirmation_url
         await state.set_state(UpBalanceState.process)
 
-        await state.set_data({"payment": payment})
+        await state.set_data({"payment": payment, "amount": count})
         log.info(f"Ожидаем оплаты от {user_id}")
         await message.answer(
             text=f"Сумма к оплате -> {count} RUB",
@@ -72,11 +71,13 @@ async def user_send_count(message: types.Message, state: FSMContext):
         await message.answer("Ошибка сервера по пробуйте позже")
 
 
-# TODO: Сделать отмену оплаты и оплату с транзакцией и увелечением баланса
 @router.callback_query((StateFilter(UpBalanceState.process)))
 async def payment_status(callback: types.CallbackQuery, state: FSMContext):
     payment: PaymentResponse | None = None
     data = await state.get_value("payment")
+    amount = await state.get_value("amount")
+    if not amount:
+        amount = 0
     if isinstance(data, PaymentResponse):
         payment = data
     else:
@@ -95,14 +96,22 @@ async def payment_status(callback: types.CallbackQuery, state: FSMContext):
                     log.info(
                         f"Проверяем оплату пользователя id={callback.from_user.id}"
                     )
-                    match Payment.find_one(payment.id).status:
+                    pay = Payment.find_one(payment.id)
+                    match pay.status:
                         case "succeeded":
+                            log.info(
+                                f"Оплата прошла успешно id={callback.from_user.id}"
+                            )
+                            await service.update_user_balance(user.id, float(amount))
                             return await edit_message(
                                 callback,
                                 f"{user.username} Успешно обработан!",
                                 UserButtons.go_home(),
                             )
                         case "canceled":
+                            log.info(
+                                f"Пользователь id={callback.from_user.id} отменил оплату"
+                            )
                             return await edit_message(
                                 callback,
                                 f"{user.username} платёж был отменён!",
@@ -116,11 +125,20 @@ async def payment_status(callback: types.CallbackQuery, state: FSMContext):
 
                 case CallBackData.START:
                     log.info(f"Пользователь id={callback.from_user.id} отменил оплату")
+                    Payment.cancel(payment.id)
                     return await edit_message(
                         callback,
                         ReplyMessages.start_message(user),
                         UserButtons.get_home_menu(),
                     )
+    except exceptions.TelegramBadRequest as err:
+        log.error(err)
+        return True
 
     except Exception as err:
         log.error(err)
+        return await edit_message(
+            callback,
+            "Произошла не предвиденная ошибка - если это вас как то задело обратитесь в поддержку",
+            UserButtons.go_home(),  # type: ignore
+        )
