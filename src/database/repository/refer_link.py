@@ -1,9 +1,7 @@
 from sqlalchemy import select
-from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.models import ReferLink
-from src.pkg.logger import log
+from src.database.models import ReferLink
 
 
 class ReferLinkRepository:

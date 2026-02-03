@@ -4,7 +4,7 @@ from aiogram.types import (
 )
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from src.models import User as DBUser
+from src.database.models import User as DBUser
 
 
 class UserKeyboards:
@@ -18,6 +18,9 @@ class UserKeyboards:
     DATA_USER_INFO = "USER_INFO"
     DATA_USER_UP_BALANCE = "USER_UP_BALANCE"
     DATA_USER_REFERRAL = "USER_REFERRAL"
+
+    DATA_CHECK_PAYMENT = "CHECK_PAYMENT"
+    DATA_CANCEL_PAYMENT = "CANCEL_PAYMENT"
 
     PREFIX_REFERRAL = "REFERRAL:"
 
@@ -69,7 +72,7 @@ class UserKeyboards:
         return buttons.as_markup()
 
     @staticmethod
-    def referals_button(users: list[DBUser]) -> InlineKeyboardMarkup:
+    def referals_button(users: list[DBUser], back_to: str) -> InlineKeyboardMarkup:
         """Кнопка рефералов"""
         buttons = InlineKeyboardBuilder()
         for user in users:
@@ -79,4 +82,21 @@ class UserKeyboards:
                     callback_data=UserKeyboards.PREFIX_REFERRAL + str(user.id),
                 )
             )
+        buttons.row(InlineKeyboardButton(text="Назад", callback_data=back_to))
+        return buttons.as_markup()
+
+    @staticmethod
+    def payment_keyboard(url: str) -> InlineKeyboardMarkup:
+        """Кнопка оплаты"""
+        buttons = InlineKeyboardBuilder()
+        buttons.row(
+            InlineKeyboardButton(
+                text="Проверить оплату", callback_data=UserKeyboards.DATA_CHECK_PAYMENT
+            ),
+            InlineKeyboardButton(
+                text="Отменить оплату", callback_data=UserKeyboards.DATA_CANCEL_PAYMENT
+            ),
+            InlineKeyboardButton(text="Перейти и оплатить", url=url),
+        )
+        buttons.adjust(2)
         return buttons.as_markup()

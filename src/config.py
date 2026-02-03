@@ -31,5 +31,8 @@ class Settings(BaseSettings):
     YOOKASSA_ID: str = ""
     YOOKASSA_KEY: str = ""
 
+    HF_API_KEY: str = ""
+    HF_SECRET_KEY: str = ""
+
 
 config = Settings()

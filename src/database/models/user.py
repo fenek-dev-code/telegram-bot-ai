@@ -1,10 +1,10 @@
 import uuid
 from typing import TYPE_CHECKING
 
-from sqlalchemy import BigInteger, Boolean, Float, ForeignKey, Integer, String
+from sqlalchemy import BigInteger, Boolean, Float, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.database import Base
+from .base import Base
 
 if TYPE_CHECKING:
     from . import Generated, ReferLink, Transaction
@@ -17,8 +17,8 @@ class User(Base):
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, nullable=False)
     username: Mapped[str] = mapped_column(String, nullable=True)
     balance: Mapped[float] = mapped_column(Float, default=0.0)
-    referrer_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("users.id"), nullable=True
+    referrer_id: Mapped[int | None] = mapped_column(
+        BigInteger, ForeignKey("users.id"), nullable=True
     )
     isAdmin: Mapped[bool] = mapped_column(Boolean, default=False)
     referral_code: Mapped[str] = mapped_column(

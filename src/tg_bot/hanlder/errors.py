@@ -46,11 +46,4 @@ async def error_handler(event: ErrorEvent):
     # 4. Проблемы с сетью
     elif isinstance(exception, TelegramNetworkError):
         log.error(f"Проблема с сетью: {exception}")
-        # Можно попробовать повторить запрос
         return True
-
-    # 5. Все остальные ошибки - логируем
-    log.error(f"Необработанная ошибка: {type(exception).__name__}: {exception}")
-    log.error(f"Update: {event.update}")
-
-    return True  # Ошибка обработана

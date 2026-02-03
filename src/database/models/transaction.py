@@ -3,7 +3,7 @@ from enum import Enum
 from sqlalchemy import BigInteger, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.database import Base
+from .base import Base
 
 
 class PaymentType(str, Enum):

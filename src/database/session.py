@@ -1,9 +1,7 @@
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
-from sqlalchemy import Column, DateTime, func
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
-from sqlalchemy.orm import declarative_base
 
 from src.config import config as conf
 
@@ -24,12 +22,3 @@ sessioon_factory = async_sessionmaker(
 async def get_session() -> AsyncGenerator[AsyncSession, None]:
     async with sessioon_factory() as session:
         yield session
-
-
-base = declarative_base()
-
-
-class Base(base):
-    __abstract__ = True
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())

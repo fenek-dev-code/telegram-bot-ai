@@ -1,7 +1,8 @@
 from typing_extensions import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from src.models import Transaction
+    from src.database.models import PaymentType, Transaction
+    from src.database.models import User as DBUser
 
 
 class UserMessages:
@@ -42,4 +43,29 @@ class UserMessages:
             + f"Уже приглашеные: {referal_count}\n"
             + f"Сумма бонусов: {amount} руб.\n"
             + f"<a href='{ref_link}'>Ссылка для приглашения</a>"
+        )
+
+    @staticmethod
+    def message_referal_info(referal: DBUser) -> str:
+        amount = sum(transaction.amount for transaction in referal.transactions)
+        return (
+            f"Твой приглашённый пользователь: {referal.username}\n"
+            + f"Генераций: {len(referal.videos)}\n"
+            + f"Сумма пополнений: {amount} руб.\n"
+            + f"Сумма бонусов: {amount / 100 * 5} руб.\n"
+        )
+
+    @staticmethod
+    def message_user_info(user: DBUser) -> str:
+        amount = sum(transaction.amount for transaction in user.transactions)
+        bonus = sum(
+            transaction.amount
+            for transaction in user.transactions
+            if transaction.type == PaymentType.REFERRAL
+        )
+        return (
+            f"Твой пользователь: {user.username}\n"
+            + f"Генераций: {len(user.videos)}\n"
+            + f"Сумма пополнений: {amount:.2f} руб.\n"
+            + f"Сумма бонусов: {bonus:.2f} руб.\n"
         )

@@ -4,8 +4,9 @@ from aiogram import F, Router, types
 from aiogram.filters import CommandStart
 from aiogram.fsm.context import FSMContext
 
+from src.database.models import User
 from src.database.repository import Repository
-from src.models import User
+from src.pkg.logger import log
 from src.tg_bot.common import UserKeyboards, UserMessages
 
 router = Router()
@@ -20,15 +21,12 @@ async def cmd_start(
 ) -> None:
     """Версия с кастингом типов"""
     await state.clear()
-    # Приводим типы явно
+    log.debug("cmd_start")
     if isinstance(update, types.CallbackQuery):
         callback = cast(types.CallbackQuery, update)
         message = cast(types.Message, callback.message)
         user = cast(types.User, callback.from_user)
-
         await callback.answer()
-
-        # Обрабатываем callback
         await handle_start_request(
             message=message, user=user, is_callback=True, raw_update=update, repo=repo
         )
@@ -51,18 +49,31 @@ async def handle_start_request(
     """Основная логика обработки старта"""
     db_user = await repo.user.get_user(user.id)
     if not db_user:
-        referrer_code = ""
+        log.debug("Creating new user")
+        user = User(id=user.id, username=user.username)
         if isinstance(raw_update, types.Message):
+            log.debug("Processing message")
             if raw_update.text:
+                log.debug("Processing text")
                 args = raw_update.text.split()
-                referrer_code = args[1] if len(args) > 1 else ""
-        db_user = await repo.user.create_user(
-            User(id=user.id, ref_code=referrer_code, username=user.username)
-        )
-
+                referrer_code = args[1] if len(args) > 1 else None
+                if referrer_code:
+                    log.debug("Processing referrer code")
+                    ref_user = await repo.user.get_user_by_ref_code(referrer_code)
+                    if ref_user:
+                        log.debug("Processing referrer user")
+                        user = User(
+                            id=user.id, username=user.username, referrer_id=ref_user.id
+                        )
+                    else:
+                        log.debug("Referrer user not found")
+                        user = User(id=user.id, username=user.username)
+                db_user = await repo.user.create_user(user=user)
+                log.debug("cmd_start completed")
     if db_user:
         bot = raw_update.bot if hasattr(raw_update, "bot") else message.bot
         if not bot:
+            log.error("Bot not found")
             return
         text = UserMessages.MESSAGE_START
         keyboard = UserKeyboards.home_menu()
@@ -72,6 +83,7 @@ async def handle_start_request(
             keyboard=keyboard,
             is_callback=is_callback,
         )
+    log.debug("cmd_start completed")
 
 
 async def send_response(

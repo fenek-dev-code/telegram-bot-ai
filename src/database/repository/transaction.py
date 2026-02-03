@@ -2,7 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.models import PaymentType, Transaction
+from src.database.models import Transaction
 from src.pkg.logger import log
 
 
@@ -11,12 +11,10 @@ class TransactionRepository:
         self.session = session
 
     async def create_transaction(
-        self, user_id: int, amount: float
+        self, user_id: int, amount: float, type: str
     ) -> Transaction | None:
         try:
-            transaction = Transaction(
-                user_id=user_id, amount=amount, status="completed"
-            )
+            transaction = Transaction(user_id=user_id, amount=amount, type=type)
             self.session.add(transaction)
             await self.session.commit()
             await self.session.refresh(transaction)
@@ -50,9 +48,9 @@ class TransactionRepository:
         try:
             query = select(Transaction).where(Transaction.user_id == user_id)
             if payment_type:
-                query = query.where(Transaction.payment_type == payment_type)
+                query = query.where(Transaction.type == payment_type)
             result = await self.session.scalars(query)
             return list(result.all())  # Явно приводим к list
         except SQLAlchemyError as e:
             log.error(f"Error getting transactions for user {user_id}: {e}")
-            return []  # Возвращаем пустой список
+            return []

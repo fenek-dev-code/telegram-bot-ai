@@ -7,7 +7,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 
 from src.config import config as conf
 from src.pkg.logger import log
-from src.tg_bot.middleware.repository import DatabaseMiddleware
+from src.tg_bot.middleware import DatabaseMiddleware
 
 from .hanlder import router
 
@@ -27,6 +27,7 @@ class TelegramBot:
 
     async def start(self) -> None:
         """Запуск бота"""
+        self.setup_middleware()
         self.polling_task = asyncio.create_task(self.dp.start_polling(self.bot))
         log.info("Бот запущен [OK]")
 
