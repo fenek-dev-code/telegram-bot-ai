@@ -1,7 +1,8 @@
+from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.models import Transaction
+from src.models import PaymentType, Transaction
 from src.pkg.logger import log
 
 
@@ -39,3 +40,19 @@ class TransactionRepository:
             await self.session.rollback()
             log.error(f"Error updating transaction: {e}")
         return None
+
+    async def get_transactions_by_user_id(
+        self, user_id: int, payment_type: str | None = None
+    ) -> list[Transaction]:
+        """
+        Получение транзакций пользователя (read-only операция)
+        """
+        try:
+            query = select(Transaction).where(Transaction.user_id == user_id)
+            if payment_type:
+                query = query.where(Transaction.payment_type == payment_type)
+            result = await self.session.scalars(query)
+            return list(result.all())  # Явно приводим к list
+        except SQLAlchemyError as e:
+            log.error(f"Error getting transactions for user {user_id}: {e}")
+            return []  # Возвращаем пустой список

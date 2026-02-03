@@ -6,10 +6,10 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src.database import Base
 
 
-class PaymentStatus(str, Enum):
-    PROCESSING = "processing"
-    COMPLETED = "completed"
-    FAILED = "failed"
+class PaymentType(str, Enum):
+    DEPOSIT = "DEPOSIT"
+    WITHDRAW = "WITHDRAW"
+    REFERRAL = "REFERRAL"
 
 
 class Transaction(Base):
@@ -17,7 +17,7 @@ class Transaction(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("users.id"), index=True)
     amount: Mapped[float] = mapped_column(Float, nullable=False)
-    status: Mapped[str] = mapped_column(String(30), default=PaymentStatus.PROCESSING)
+    type: Mapped[str] = mapped_column(String(30), nullable=False)
 
     # Связи
     user = relationship("User", back_populates="transactions")

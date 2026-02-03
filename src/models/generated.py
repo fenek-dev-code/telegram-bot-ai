@@ -1,6 +1,6 @@
 from enum import Enum
 
-from sqlalchemy import Float, ForeignKey, Integer, String
+from sqlalchemy import BigInteger, Float, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.database import Base
@@ -14,23 +14,16 @@ class GeneratedStatus(Enum):
     FAILED = "failed"
 
 
-class GenerateFormat(Enum):
-    """Formats for generated content."""
-
-    VIDEO = "video"
-    AUDIO = "audio"
-    IMAGE = "image"
-
-
 class Generated(Base):
     __tablename__ = "converted_videos"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     user_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("users.id"), nullable=False, index=True
+        BigInteger, ForeignKey("users.id"), nullable=False, index=True
     )
     status: Mapped[str] = mapped_column(String(30), default=GeneratedStatus.PROCESSING)
-    format: Mapped[str] = mapped_column(String(30), default=GenerateFormat.VIDEO)
+    prompt: Mapped[str] = mapped_column(Text, nullable=True)
+
     time_duration: Mapped[float] = mapped_column(Float, nullable=True)
     amount_tokens: Mapped[float] = mapped_column(Float, nullable=True)
 

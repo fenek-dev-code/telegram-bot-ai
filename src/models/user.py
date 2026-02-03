@@ -20,6 +20,7 @@ class User(Base):
     referrer_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("users.id"), nullable=True
     )
+    isAdmin: Mapped[bool] = mapped_column(Boolean, default=False)
     referral_code: Mapped[str] = mapped_column(
         String(10),
         unique=True,

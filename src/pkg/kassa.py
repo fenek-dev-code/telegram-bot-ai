@@ -3,7 +3,7 @@ import uuid
 from yookassa import Configuration, Payment
 from yookassa.payment import PaymentResponse
 
-from src.core.config import config
+from src.config import config
 
 Configuration.account_id = config.YOOKASSA_ID
 Configuration.secret_key = config.YOOKASSA_KEY

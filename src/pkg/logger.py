@@ -5,7 +5,7 @@ import sys
 
 from loguru import logger
 
-from src.core.config import config as conf
+from src.config import config as conf
 
 
 def serialize(record):

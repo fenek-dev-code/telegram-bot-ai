@@ -5,7 +5,7 @@ from sqlalchemy import Column, DateTime, func
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import declarative_base
 
-from .core.config import config as conf
+from src.config import config as conf
 
 engine = create_async_engine(
     url=conf.DATABASE_URL,

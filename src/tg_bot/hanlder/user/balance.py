@@ -4,12 +4,8 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from yookassa.payment import Payment, PaymentResponse
 
-from src.core.service import UserService
-from src.database import get_session
 from src.pkg.kassa import create_payment
 from src.pkg.logger import log
-from src.tg_bot.buttons import CallBackData, PaymentButtons, UserButtons
-from src.tg_bot.common import ReplyMessages, edit_message
 
 router = Router()
 
@@ -17,8 +13,6 @@ router = Router()
 class UpBalanceState(StatesGroup):
     count = State()
     process = State()
-    succes = State()
-    fail = State()
 
 
 @router.callback_query(F.data == CallBackData.UP_BALANCE)
